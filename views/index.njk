@@ -1,9 +1,30 @@
 {% extends "layout.njk" %}
 
 {% block content %}
-    <h1> {{title}}</h1>
-    <p>Welcome to {{title}}</p>
-    {% for tweet in tweets %}
-        {{tweet.message}}
-    {% endfor %}
+    
+    <main>
+        <h1>Shitter™</h1>
+        <h2>{{ title }}</h2>
+        <p>{{ message }}</p>
+        <ul class="tweets">
+          {% for tweet in tweets %}
+            <li class="tweet">
+              <article>
+                <header>
+                  <h3>{{ tweet.name }}</h3>
+                  <time datetime="{{ tweet.updated_at }}">{{ tweet.updated_at }}</time>
+                </header>
+                <p>{{ tweet.message }}</p>
+                <footer>
+                  <ul>
+                    <li>Share</li>
+                    <li>Reply</li>
+                    <li>Favourite</li>
+                  </ul>
+                </footer>
+              </article>
+            </li>
+          {% endfor %}
+        </ul>
+      </main>
 {% endblock %}
