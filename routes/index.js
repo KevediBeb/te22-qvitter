@@ -14,4 +14,15 @@ router.get("/", async(req, res) => {
     })
 })
 
+router.post('/', async (req, res) => {
+    console.log(req.body)
+    const {author_id, message} = req.body
+  
+    const [result] = await pool.promise().query('INSERT INTO tweet (author_id, message) VALUES (?, ?)', [author_id, message])
+  
+    //res.json(result)
+
+    res.redirect("/")
+  })
+
 export default router
