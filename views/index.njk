@@ -6,6 +6,9 @@
         <h1>Shitter™</h1>
         <h2>{{ title }}</h2>
         <p>{{ message }}</p>
+        <a href="/new">
+          <button>Create a Shit™</button>
+        </a>
         <ul class="tweets">
           {% for tweet in tweets %}
             <li class="tweet">
@@ -20,6 +23,16 @@
                     <li>Share</li>
                     <li>Reply</li>
                     <li>Favourite</li>
+                    <a href="{{ tweet.id }}/edit" class="button-icon">
+                      <span class="material-symbols-outlined">
+                        edit
+                      </span>
+                    </a>
+                    <form action="/{{tweet.id}}/delete" method="POST">
+        
+                      <button type="submit">Delete</button>
+                  </form>
+                  
                   </ul>
                 </footer>
               </article>
@@ -27,4 +40,34 @@
           {% endfor %}
         </ul>
       </main>
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const timeElements = document.querySelectorAll("time[datetime]");
+          timeElements.forEach(timeElement => {
+            const date = new Date(timeElement.getAttribute("datetime"));
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+            const diffInMinutes = Math.floor(diffInSeconds / 60);
+            const diffInHours = Math.floor(diffInMinutes / 60);
+            const diffInDays = Math.floor(diffInHours / 24);
+            const diffInYears = Math.floor(diffInDays / 364);
+      
+            let displayText;
+            if(diffInYears > 0){
+              displayText = `${diffInYears} year${diffInYears > 1 ? 's' : ''} ago`;
+            }
+            else if (diffInDays > 0) {
+              displayText = `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+            } else if (diffInHours > 0) {
+              displayText = `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+            } else if (diffInMinutes > 0) {
+              displayText = `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+            } else {
+              displayText = `${diffInSeconds} second${diffInSeconds > 1 ? 's' : ''} ago`;
+            }
+      
+            timeElement.textContent = displayText;
+          });
+        });
+      </script>
 {% endblock %}

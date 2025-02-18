@@ -1,9 +1,11 @@
 {% extends "layout.njk" %}
 {% block content %}
 
-<h1>{{title}}</h1>
+<main>
+    <h1>{{title}}</h1>
 <h2>Create a Shit™</h2>
 <form action="/" method="POST">
+    
     <label for="message">Message</label>
     <div>
         <textarea type="text" name="message" id="message"></textarea>
@@ -22,7 +24,13 @@
     </select>
 
     
-    <button type="submit">Submit</button>
+    <button type="submit">Shit</button>
   </form>
+
+  <a href="/">
+    <button>Back</button>
+  </a>
   
+</main>
+
 {% endblock %} 

@@ -1,0 +1,28 @@
+{% extends "layout.njk" %}
+{% block content %}
+
+<main>
+    <h1>{{title}}</h1>
+<h2>Edit the Shit™</h2>
+<form action="/{{tweet.id}}/edit" method="POST">
+    
+    <label for="message">Message</label>
+    <input type="hidden" name="id" value="{{ tweet.id }}">
+    <div>
+        <textarea type="text" name="message" id="message">{{tweet.message}}</textarea>
+    </div>
+    
+    
+    
+
+    
+    <button type="submit">Edit</button>
+  </form>
+
+  <a href="/">
+    <button>Back</button>
+  </a>
+  
+</main>
+
+{% endblock %} 

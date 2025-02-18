@@ -4,6 +4,7 @@ import nunjucks from "nunjucks"
 import bodyParser from "body-parser"
 import indexRouter from "./routes/index.js"
 import tweetRouter from "./routes/tweet.js"
+import logger from "morgan"
 
 
 const app = express()
@@ -20,6 +21,9 @@ nunjucks.configure("views", {
     express: app,
     
 })
+
+app.use(logger("dev"))
+app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use("/", indexRouter)
 app.use("/", tweetRouter)
