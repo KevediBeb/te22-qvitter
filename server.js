@@ -5,6 +5,7 @@ import bodyParser from "body-parser"
 import indexRouter from "./routes/index.js"
 import tweetRouter from "./routes/tweet.js"
 import logger from "morgan"
+import bcrypt from "bcrypt"
 
 
 const app = express()

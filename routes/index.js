@@ -1,10 +1,85 @@
 import express from "express"
+import session from "express-session"
 import pool from "../db.js"
 import { body, matchedData, validationResult } from "express-validator"
+import bcrypt from "bcrypt"
 
 const router = express.Router()
 
-router.get("/", async(req, res) => {
+const saltRounds = 10;
+const myPlaintextPassword = 'test';
+const someOtherPlaintextPassword = 'not_bacon';
+
+bcrypt.hash(myPlaintextPassword, 10, function(err, hash) {
+	// här får vi nu tag i lösenordets hash i variabeln hash
+	console.log(hash)
+})
+
+router.use(session({
+  secret: "keyboard cat",
+  resave: false,
+  saveUninitialized: true,
+  cookie: { sameSite: true }
+}))
+
+var success = false
+var loggedInUserId = -1 // tänker att man kollar om det är -1 och om det är -1 deny access
+
+router.get("/", (req, res) => {
+  res.redirect("/login")
+})
+
+router.get("/login", (req, res) => {
+  if (req.session.views) {
+    req.session.views++
+  } else {
+    req.session.views = 1
+  }
+  res.render("login.njk",
+    { title: "Test", message: "Funkar?", views: req.session.views }
+  )
+})
+
+router.post('/login', async (req, res) => {
+  
+  console.log(req.body)
+  
+  const {name, password} = req.body
+  const [result] = await pool
+    .promise()
+    .query(`SELECT * FROM user WHERE name = ?`, [name])
+  
+  //
+
+  
+  if(result[0] !== undefined){
+    console.log(result[0].password)
+    bcrypt.compare(password, result[0].password, function(err, result) {
+      if(result){
+        
+        success = true
+        console.log("rätt, " + success)
+      }else{
+        
+        success = false
+        console.log("Wrong username or password, " + success)
+      }
+      console.log("final, " + success)
+  if(success == true){
+    res.redirect("/home")
+  }else{
+    res.redirect("/")
+  }
+    });
+  }
+  
+  
+  
+  
+})
+
+router.get("/home", async(req, res) => {
+  if(success == true){
     const [tweets] = await pool
     .promise()
     .query(`SELECT tweet.*, users.name FROM tweet JOIN users ON tweet.author_id = users.id  ORDER BY updated_at DESC;;`)
@@ -13,9 +88,14 @@ router.get("/", async(req, res) => {
         title: "Home",
         tweets
     })
+  }else{
+    console.log("NOT LOGGED IN!!!!")
+    res.redirect("/")
+  }
+    
 })
 
-router.post('/', async (req, res) => {
+router.post('/home', async (req, res) => {
     console.log(req.body)
     const {author_id, message} = req.body
   
@@ -23,7 +103,7 @@ router.post('/', async (req, res) => {
   
     //res.json(result)
 
-    res.redirect("/")
+    res.redirect("/home")
 })
 
 router.post('/:id/delete', async (req, res) => {
