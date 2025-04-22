@@ -23,6 +23,7 @@ router.use(session({
 }))
 
 var success = false
+var loggedInUserName = ""
 var loggedInUserId = -1 // tänker att man kollar om det är -1 och om det är -1 deny access
 
 router.get("/", (req, res) => {
@@ -36,7 +37,7 @@ router.get("/login", (req, res) => {
     req.session.views = 1
   }
   res.render("login.njk",
-    { title: "Test", message: "Funkar?", views: req.session.views }
+    { title: "Log in", message: "Funkar?", views: req.session.views }
   )
 })
 
@@ -51,13 +52,15 @@ router.post('/login', async (req, res) => {
   
   //
 
-  
+  console.log(result)
   if(result[0] !== undefined){
     console.log(result[0].password)
-    bcrypt.compare(password, result[0].password, function(err, result) {
-      if(result){
+    bcrypt.compare(password, result[0].password, function(err, resul) {
+      if(resul){
         
         success = true
+        loggedInUserName = name
+        loggedInUserId = result[0].id
         console.log("rätt, " + success)
       }else{
         
@@ -86,6 +89,7 @@ router.get("/home", async(req, res) => {
 
     res.render("index.njk",{
         title: "Home",
+        username: loggedInUserName,
         tweets
     })
   }else{

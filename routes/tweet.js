@@ -1,5 +1,6 @@
 import express from "express"
 import pool from "../db.js"
+//import loggedInUserId from "../routes/index.js"
 
 const router = express.Router()
 
@@ -8,9 +9,10 @@ router.get("/new", async(req, res) => {
     .promise()
     .query(`SELECT * FROM users`)
 
+    //console.log(loggedInUserId)
     res.render("tweet.njk",{
         title: "Shit",
-        users
+        users: alert(loggedInUserId)
     })
 })
 
