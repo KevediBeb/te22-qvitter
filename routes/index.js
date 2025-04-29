@@ -1,6 +1,6 @@
 import express from "express"
 import session from "express-session"
-import pool from "../db.js"
+import db from "../db-sqlite.js"
 import { body, matchedData, validationResult } from "express-validator"
 import bcrypt from "bcrypt"
 
@@ -46,21 +46,20 @@ router.post('/login', async (req, res) => {
   console.log(req.body)
   
   const {name, password} = req.body
-  const [result] = await pool
-    .promise()
-    .query(`SELECT * FROM user WHERE name = ?`, [name])
+  const result = await db.get(`SELECT * FROM user WHERE name = ?`, name)
   
   //
 
   console.log(result)
-  if(result[0] !== undefined){
-    console.log(result[0].password)
-    bcrypt.compare(password, result[0].password, function(err, resul) {
+  if(result !== undefined){
+    console.log(result.password)
+    bcrypt.compare(password, result.password, function(err, resul) {
       if(resul){
         
         success = true
         loggedInUserName = name
-        loggedInUserId = result[0].id
+        loggedInUserId = result.id
+        console.log("logged in user id: " + loggedInUserId)
         console.log("rätt, " + success)
       }else{
         
@@ -83,9 +82,7 @@ router.post('/login', async (req, res) => {
 
 router.get("/home", async(req, res) => {
   if(success == true){
-    const [tweets] = await pool
-    .promise()
-    .query(`SELECT tweet.*, users.name FROM tweet JOIN users ON tweet.author_id = users.id  ORDER BY updated_at DESC;;`)
+    const tweets = await db.all(`SELECT tweet.*, user.name FROM tweet JOIN user ON tweet.author_id = user.id  ORDER BY updated_at DESC;;`)
 
     res.render("index.njk",{
         title: "Home",
@@ -103,7 +100,7 @@ router.post('/home', async (req, res) => {
     console.log(req.body)
     const {author_id, message} = req.body
   
-    const [result] = await pool.promise().query('INSERT INTO tweet (author_id, message) VALUES (?, ?)', [author_id, message])
+    await db.run("INSERT INTO tweet (author_id, message) VALUES (?, ?)", author_id , message)
   
     //res.json(result)
 

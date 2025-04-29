@@ -1,18 +1,16 @@
 import express from "express"
-import pool from "../db.js"
+import db from "../db-sqlite.js"
 //import loggedInUserId from "../routes/index.js"
 
 const router = express.Router()
 
 router.get("/new", async(req, res) => {
-    const [users] = await pool
-    .promise()
-    .query(`SELECT * FROM users`)
+    const [users] = await db.all(`SELECT * FROM user`)
 
-    //console.log(loggedInUserId)
+    console.log(loggedInUserId)
     res.render("tweet.njk",{
         title: "Shit",
-        users: alert(loggedInUserId)
+        user: loggedInUserId
     })
 })
 
