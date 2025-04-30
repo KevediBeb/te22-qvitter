@@ -1,6 +1,6 @@
 import express from "express"
 import db from "../db-sqlite.js"
-//import loggedInUserId from "../routes/index.js"
+import { loggedInUserId } from "./index.js"
 
 const router = express.Router()
 

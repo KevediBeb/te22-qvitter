@@ -136,3 +136,4 @@ router.post("/:id/edit",
   })
 
 export default router
+export { loggedInUserId }
