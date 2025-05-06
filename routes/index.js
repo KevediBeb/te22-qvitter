@@ -7,7 +7,7 @@ import bcrypt from "bcrypt"
 const router = express.Router()
 
 const saltRounds = 10;
-const myPlaintextPassword = 'test';
+const myPlaintextPassword = 'doejohn';
 const someOtherPlaintextPassword = 'not_bacon';
 
 bcrypt.hash(myPlaintextPassword, 10, function(err, hash) {
@@ -27,7 +27,18 @@ var loggedInUserName = ""
 var loggedInUserId = -1 // tänker att man kollar om det är -1 och om det är -1 deny access
 
 router.get("/", (req, res) => {
-  res.redirect("/login")
+  if(success == true && loggedInUserId > -1){
+    res.redirect("/home")
+  }else{
+    res.redirect("/login")
+  }
+  
+})
+
+router.post("/", (req, res) => {
+  success = false
+  loggedInUserId = -1
+  res.redirect("/")
 })
 
 router.get("/login", (req, res) => {
@@ -36,8 +47,18 @@ router.get("/login", (req, res) => {
   } else {
     req.session.views = 1
   }
+  var msg = ""
+  if(success == false){
+    if(req.session.views == 1){
+      msg = "Funkar?"
+    }else{
+      msg = "Wrong username or password"
+    }
+  }else{
+    msg = "Funkar?"
+  }
   res.render("login.njk",
-    { title: "Log in", message: "Funkar?", views: req.session.views }
+    { title: "Log in", message: msg, views: req.session.views }
   )
 })
 
@@ -67,13 +88,19 @@ router.post('/login', async (req, res) => {
         console.log("Wrong username or password, " + success)
       }
       console.log("final, " + success)
-  if(success == true){
-    res.redirect("/home")
-  }else{
-    res.redirect("/")
-  }
+      if(success == true){
+        success = true
+        loggedInUserName = name
+        res.redirect("/home")
+      }else{
+        success = false
+        res.redirect("/");
+      }
     });
+    
   }
+  
+  
   
   
   
@@ -81,7 +108,7 @@ router.post('/login', async (req, res) => {
 })
 
 router.get("/home", async(req, res) => {
-  if(success == true){
+  if(success == true && loggedInUserId > -1){
     const tweets = await db.all(`SELECT tweet.*, user.name FROM tweet JOIN user ON tweet.author_id = user.id  ORDER BY updated_at DESC;;`)
 
     res.render("index.njk",{
@@ -108,15 +135,22 @@ router.post('/home', async (req, res) => {
 })
 
 router.post('/:id/delete', async (req, res) => {
+  if(success == true && loggedInUserId > -1){
     const id = [req.params.id]
     console.log(id)
     // vi rullar en egen check så att det är ett nummer
   if (!Number.isInteger(Number(id))) {
     return res.status(400).send("Invalid ID")
   }
-    const [result] = await pool.promise().query('DELETE FROM `webbserver`.`tweet` WHERE (`id` = ?)', [id])
+    const result = await db.get('DELETE FROM tweet WHERE id = ?', id)
   
-    res.redirect("/")
+    
+  }else{
+    console.log("NOT LOGGED IN!!!!")
+    
+  }
+  res.redirect("/")
+    
 })
 
 router.post("/:id/edit",
@@ -124,15 +158,23 @@ router.post("/:id/edit",
     body("message").isLength({ min: 1, max: 130 }),
     body("message").escape(),
     async (req, res) => {
-    const errors = validationResult(req)
+      if(success == true && loggedInUserId > -1){
+        console.log("editing... for real this time")
+        const errors = validationResult(req)
     console.log(errors)
     if (!errors.isEmpty()) { return res.status(400).send("Invalid input") }
   
     const { id, message } = matchedData(req) // req.params.message varför inte?
     const timestamp = new Date().toISOString().slice(0, 19).replace("T", " ")
     console.log(timestamp)
-    await pool.promise().query("UPDATE tweet SET message = ?, updated_at = ? WHERE id = ?", [message, timestamp, id])
-    res.redirect("/")
+    await db.run("UPDATE tweet SET message = ?, updated_at = ? WHERE id = ?", message, timestamp, id)
+    
+      }else{
+        console.log("NOT LOGGED IN!!!!")
+        
+      }
+      res.redirect("/")
+    
   })
 
 export default router
