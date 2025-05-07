@@ -12,7 +12,7 @@ const someOtherPlaintextPassword = 'not_bacon';
 
 bcrypt.hash(myPlaintextPassword, 10, function(err, hash) {
 	// här får vi nu tag i lösenordets hash i variabeln hash
-	console.log(hash)
+	//console.log(hash)
 })
 
 router.use(session({
@@ -22,6 +22,7 @@ router.use(session({
   cookie: { sameSite: true }
 }))
 
+var userExist = false
 var success = false
 var loggedInUserName = ""
 var loggedInUserId = -1 // tänker att man kollar om det är -1 och om det är -1 deny access
@@ -52,7 +53,7 @@ router.get("/login", (req, res) => {
     if(req.session.views == 1){
       msg = "Funkar?"
     }else{
-      msg = "Wrong username or password"
+      msg = "Wrong username or password or you just created an account idk"
     }
   }else{
     msg = "Funkar?"
@@ -106,6 +107,68 @@ router.post('/login', async (req, res) => {
   
   
 })
+
+router.get("/account/new", (req, res) => {
+  if (req.session.views) {
+    req.session.views++
+  } else {
+    req.session.views = 1
+  }
+  var msg = "Register account"
+  if(userExist == false){
+    msg = "Register account"
+  }else{
+    msg = "Username already taken bumass"
+    userExist = false
+  }
+  
+  
+  res.render("account_create.njk",
+    { title: "Account creation", message: msg, views: req.session.views }
+  )
+})
+
+router.post('/account/new', async (req, res) => {
+  
+  var red = "/"
+
+  console.log(req.body)
+  
+  const {name, password} = req.body
+
+  const result = await db.get(`SELECT * FROM user WHERE name = ?`, name)
+
+  var pass = ""
+  bcrypt.hash(password, 10, function(err, hash) {
+    console.log(hash)
+    pass = hash
+    console.log(password)
+  })
+
+  var check = function(){
+    if(pass != ""){
+      if(result === undefined){
+        db.run('INSERT INTO user (name, password) VALUES (?, ?)', name, pass)
+        console.log("ACCOUNT CREATED FOR " + name)
+      }else{
+        userExist = true
+        console.log("User already exist bum ass!!")
+        red = "/account/new"
+      }
+      res.redirect(red)
+        
+    }
+    else {
+        setTimeout(check, 100);
+    }
+  }
+
+  check();
+
+  
+})
+
+
 
 router.get("/home", async(req, res) => {
   if(success == true && loggedInUserId > -1){

@@ -4,12 +4,18 @@
     
     <main>
       
+        
+        
+        <img src="/img/shitterlogo.png" alt="logo" height="100vm" width="100vm">
         <h1>Shitter™</h1>
+        
+        
         <h2>{{ title }}</h2>
         <h3>Logged in as: {{ username }}</h3>
         <form action="/" method="POST">
         
         <button type="submit">Log out</button>
+        </form>
         <p>{{ message }}</p>
         <a href="/new">
           <button>Create a Shit™</button>
@@ -27,7 +33,7 @@
                   <ul>
                     <li>Share</li>
                     <li>Reply</li>
-                    <li>Favourite</li>
+                    <li>Favorite</li>
                     {% if username == tweet.name %}
                     <a href="{{ tweet.id }}/edit" class="button-icon">
                       <span class="material-symbols-outlined">

@@ -11,7 +11,7 @@
   <p>views: {{ views }}</p>
   
 
-  <form action="/login/" method="POST">
+  <form action="/account/new" method="POST">
     
     <label for="name">Username</label>
     <div>
@@ -26,14 +26,10 @@
     
 
     
-    <button type="submit">Log in</button>
+    <button type="submit">Register</button>
+    
   </form>
 
-  <h3>Don't have a Shitter™ account? WHAT ARE YOU DOING <a href="/account/new" class="button-icon">
-    <span class="material-symbols-outlined">
-      CREATE
-    </span>
-  </a> ONE NOW!!</h3>
   
 </main>
 {% endblock %}
