@@ -13,8 +13,9 @@ await db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     message TEXT,
     author_id INTEGER,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    likes INTEGER,
+    created_at DATETIME DEFAULT (DATETIME('now', 'localtime')),
+    updated_at DATETIME DEFAULT (DATETIME('now', 'localtime'))
   );
 `);
 // Create the user table if it doesn't exist
@@ -23,8 +24,8 @@ await db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(255),
     password VARCHAR(255),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT (DATETIME('now', 'localtime')),
+    updated_at DATETIME DEFAULT (DATETIME('now', 'localtime'))
   );
 `);
 // Insert a default user if the table is empty

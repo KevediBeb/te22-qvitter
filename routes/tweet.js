@@ -1,16 +1,15 @@
 import express from "express"
 import db from "../db-sqlite.js"
-import { loggedInUserId } from "./index.js"
 
 const router = express.Router()
 
 router.get("/new", async(req, res) => {
     const [users] = await db.all(`SELECT * FROM user`)
 
-    console.log(loggedInUserId)
+    // console.log(loggedInUserId)
     res.render("tweet.njk",{
         title: "Shit",
-        user: loggedInUserId
+        user: req.session.userId
     })
 })
 
